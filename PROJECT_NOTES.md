@@ -21,6 +21,7 @@ AppForge là ứng dụng Android quản lý ứng dụng đặc quyền (qua Sh
 - `app/src/main/java/com/example/ui/MainViewModel.kt`: Quản lý state, bộ lọc, tìm kiếm, chọn nhiều và thực thi hàng loạt.
 - `app/src/main/java/com/example/ui/screens/*.kt`, `MainActivity.kt`: Giao diện 4 tab (Ứng dụng, Khôi phục, Mặc định, Quyền) và `AppDetailBottomSheet`.
 - `.github/workflows/build-apk.yml`: GitHub Actions tự động giải mã `debug.keystore.base64`, chạy `gradle assembleDebug` (Gradle 9.3.1, JDK 21) và phát hành file `.apk` lên GitHub Releases + Artifacts khi push lên `main`/`master`.
+- `bitrise.yml`: Cấu hình Bitrise CI/CD dùng JDK 21, tải Gradle 9.3.1, giải mã `debug.keystore.base64`, chạy `gradle assembleDebug` và deploy `AppForge-debug.apk` (khắc phục việc template thiếu `gradlew`).
 
 ## Quy ước & Ràng buộc an toàn
 - `com.android.settings` (Cài đặt) được khóa bảo vệ tuyệt đối, không cho phép ẩn hoặc xóa.

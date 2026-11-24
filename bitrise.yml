@@ -1,0 +1,52 @@
+format_version: '13'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: android
+
+app:
+  envs:
+    - GRADLE_VERSION: '9.3.1'
+
+trigger_map:
+  - push_branch: '*'
+    workflow: primary
+
+workflows:
+  primary:
+    steps:
+      - git-clone@8: {}
+      - set-java-version@1:
+          inputs:
+            - set_java_version: '21'
+      - script@1:
+          title: Setup Debug Keystore, Gradle 9.3.1 & Build APK
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+                set -euo pipefail
+
+                if [ -s debug.keystore.base64 ]; then
+                  base64 -d debug.keystore.base64 > debug.keystore
+                fi
+                if [ ! -s debug.keystore ]; then
+                  keytool -genkey -v -keystore debug.keystore \
+                    -storepass android -alias androiddebugkey -keypass android \
+                    -keyalg RSA -keysize 2048 -validity 10000 \
+                    -dname "CN=Android Debug,O=Android,C=US"
+                fi
+
+                if [ -n "${ANDROID_HOME:-}" ] && [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+                  yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null 2>&1 || true
+                fi
+
+                curl -fsSL "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -o /tmp/gradle.zip
+                rm -rf /tmp/gradle-dist
+                unzip -q /tmp/gradle.zip -d /tmp/gradle-dist
+                export PATH="/tmp/gradle-dist/gradle-${GRADLE_VERSION}/bin:$PATH"
+
+                gradle assembleDebug --no-daemon
+
+                mkdir -p "${BITRISE_DEPLOY_DIR:-./deploy}"
+                cp app/build/outputs/apk/debug/app-debug.apk "${BITRISE_DEPLOY_DIR:-./deploy}/AppForge-debug.apk"
+      - deploy-to-bitrise-io@2:
+          inputs:
+            - deploy_path: $BITRISE_DEPLOY_DIR
