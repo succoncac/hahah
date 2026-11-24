@@ -1,0 +1,6 @@
+{
+  "name": "AppForge",
+  "description": "Công cụ quản lý, gỡ bỏ hoàn toàn và khôi phục ứng dụng hệ thống, ẩn ứng dụng, và ép ứng dụng mặc định qua Shizuku, Root hoặc ADB.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
